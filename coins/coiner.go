@@ -7,6 +7,7 @@ import (
 
 type SigningOptional struct {
 	PreviousScript []byte
+	RedeemScript   []byte
 }
 
 type Coiner interface {
@@ -21,5 +22,6 @@ type Coiner interface {
 	GetFullName() string
 	BaseUnitsToBigUnits(baseUnits *big.Int) *big.Float
 	BigUnitsToBaseUnits(bigUnits *big.Float) (*big.Int, error)
+	// privKey format WIF for BTC, BCH
 	SignTx(rawTx []byte, privKey string, optional SigningOptional) ([]byte, error)
 }

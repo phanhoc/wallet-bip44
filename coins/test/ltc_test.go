@@ -10,7 +10,7 @@ import (
 )
 
 func TestLtc_NewAccount(t *testing.T) {
-	ltcChain := &chaincfg.MainNetParams
+	ltcChain := new(chaincfg.Params)
 	ltcChain.HDCoinType = 2
 	ltcChain.Bech32HRPSegwit = "ltc"
 	ltcChain.PubKeyHashAddrID = 0x30        // starts with L
@@ -20,15 +20,22 @@ func TestLtc_NewAccount(t *testing.T) {
 	ltcChain.WitnessScriptHashAddrID = 0x0A // starts with 7Xh
 
 	// BIP32 hierarchical deterministic extended key magics
-	ltcChain.HDPrivateKeyID = [4]byte{0x04, 0x88, 0xad, 0xe4} // starts with xprv
-	ltcChain.HDPublicKeyID = [4]byte{0x04, 0x88, 0xb2, 0x1e}  // starts with xpub
+	ltcChain.HDPrivateKeyID = [4]byte{0x01, 0x9d, 0x9c, 0xfe} // starts with Lxprv
+	ltcChain.HDPublicKeyID = [4]byte{0x01, 0x9d, 0xa4, 0x62}  // starts with Lxpub
+
+	err := chaincfg.Register(ltcChain)
+
+	if err != nil {
+		t.Fatalf("failed to register, %v", err)
+	}
+
 	seed := bip39.NewSeed("announce parent popular hybrid fine maid exile impulse unknown school castle wage hand impulse wing", "")
 	t.Log(hex.EncodeToString(seed))
 	master, err := hdkeychain.NewMaster(seed, ltcChain)
 	if err != nil {
 		t.Fatalf("failed to new master, err: %v", err)
 	}
-	expectedAccount := "xprv9xpaCu1436QpkNN1uZFAL41FEbVb7cSCejWXKJzNt8T2V9SGVpD4VxMwfX5C5o7vHZH4VVgKEw9oEzMSY9cmxKhY8KhJesF6dE5pEetoMA1"
+	expectedAccount := "Ltpv774hUGKSWkkAbM1bMTHnUUDzRrxTCc7Y4iY5GoNosn37VxD9NSycro4bdHcCxWm7CfrLa1KqQ1rTEVUWwGbkbS4t5teUxpJ8RchiJ5r6GqC"
 	mString := master.String()
 	ltc := coins.NewLtc()
 	account, err := ltc.NewAccount(mString, 0)
@@ -42,9 +49,23 @@ func TestLtc_NewAccount(t *testing.T) {
 }
 
 func TestLtc_GenerateNormalAddress(t *testing.T) {
+	ltcChain := new(chaincfg.Params)
+	ltcChain.HDCoinType = 2
+	ltcChain.Bech32HRPSegwit = "ltc"
+	ltcChain.PubKeyHashAddrID = 0x30        // starts with L
+	ltcChain.ScriptHashAddrID = 0x32        // starts with M
+	ltcChain.PrivateKeyID = 0xB0            // starts with 6 (uncompressed) or T (compressed)
+	ltcChain.WitnessPubKeyHashAddrID = 0x06 // starts with p2
+	ltcChain.WitnessScriptHashAddrID = 0x0A // starts with 7Xh
+
+	// BIP32 hierarchical deterministic extended key magics
+	ltcChain.HDPrivateKeyID = [4]byte{0x01, 0x9d, 0x9c, 0xfe} // starts with Lxprv
+	ltcChain.HDPublicKeyID = [4]byte{0x01, 0x9d, 0xa4, 0x62}  // starts with Lxpub
+	chaincfg.Register(ltcChain)
+
 	seed := bip39.NewSeed("announce parent popular hybrid fine maid exile impulse unknown school castle wage hand impulse wing", "")
 	t.Log(hex.EncodeToString(seed))
-	master, err := hdkeychain.NewMaster(seed, &chaincfg.MainNetParams)
+	master, err := hdkeychain.NewMaster(seed, ltcChain)
 	if err != nil {
 		t.Fatalf("failed to new master, err: %v", err)
 	}

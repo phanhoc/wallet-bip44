@@ -80,9 +80,12 @@ func TestBch_GenerateMultisigAddress(t *testing.T) {
 	xPub = append(xPub, account_2.AccountPrivateKey)
 
 	address, err := tbtc.GenerateMultisigAddress(xPub, 0, 2, 3, false)
+	if err != nil {
+		t.Fatalf("failed to generate multisig, err: %v", err)
+	}
 	t.Log(address.Address)
 	t.Log(hex.EncodeToString(address.RedeemScript))
-	_, addresses, _, _ :=txscript.ExtractPkScriptAddrs(address.RedeemScript, &chaincfg.MainNetParams)
+	_, addresses, _, _ := txscript.ExtractPkScriptAddrs(address.RedeemScript, &chaincfg.MainNetParams)
 	fmt.Println(spew.Sdump(addresses))
 	fmt.Println(addresses[0].EncodeAddress())
 

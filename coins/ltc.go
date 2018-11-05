@@ -11,7 +11,7 @@ type Ltc struct {
 }
 
 func NewLtc() *Ltc {
-	ltcChain := &chaincfg.MainNetParams
+	ltcChain := new(chaincfg.Params)
 	ltcChain.HDCoinType = 2
 	ltcChain.Bech32HRPSegwit = "ltc"
 	ltcChain.PubKeyHashAddrID = 0x30        // starts with L
@@ -21,8 +21,9 @@ func NewLtc() *Ltc {
 	ltcChain.WitnessScriptHashAddrID = 0x0A // starts with 7Xh
 
 	// BIP32 hierarchical deterministic extended key magics
-	ltcChain.HDPrivateKeyID = [4]byte{0x04, 0x88, 0xad, 0xe4} // starts with xprv
-	ltcChain.HDPublicKeyID = [4]byte{0x04, 0x88, 0xb2, 0x1e}  // starts with xpub
+	ltcChain.HDPrivateKeyID = [4]byte{0x01, 0x9d, 0x9c, 0xfe} // starts with Lxprv
+	ltcChain.HDPublicKeyID = [4]byte{0x01, 0x9d, 0xa4, 0x62}  // starts with Lxpub
+	chaincfg.Register(ltcChain)
 	return &Ltc{
 		Btc{NetWork: ltcChain},
 	}
