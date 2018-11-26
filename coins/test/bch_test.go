@@ -60,7 +60,7 @@ func TestBch_GenerateMultisigAddress(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to new master, err: %v", err)
 	}
-	expectedAddress := "1Jgub4PAFFXabXemD1VZ143BSCBf1ax2S7"
+	expectedAddress := "pr46qq772t3j7xnkua4k0qk5z3vwrzlt5ysq2395z2"
 	tbtc := coins.NewBch()
 	account_0, err := tbtc.NewAccount(master.String(), 0)
 	if err != nil {

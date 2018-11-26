@@ -11,6 +11,7 @@ import (
 
 func TestLtc_NewAccount(t *testing.T) {
 	ltcChain := new(chaincfg.Params)
+	ltcChain.Net = chaincfg.MainNetParams.Net + 1
 	ltcChain.HDCoinType = 2
 	ltcChain.Bech32HRPSegwit = "ltc"
 	ltcChain.PubKeyHashAddrID = 0x30        // starts with L

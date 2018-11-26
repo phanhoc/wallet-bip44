@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"github.com/btcsuite/btcwallet/snacl"
 	"io/ioutil"
-	"nextop/c-horde/walletengine/offlinetool/common"
 	"strings"
 )
 
@@ -71,7 +70,7 @@ func (e *Encrypter) writeEncryptedToFile(data []byte) error {
 		return err
 	}
 
-	return common.WriteDataToFile(e.filePath, encrypted)
+	return WriteDataToFile(e.filePath, encrypted)
 }
 
 // getRawDataFromEncryptedFile is helper to decrypted keystore file  and return raw data

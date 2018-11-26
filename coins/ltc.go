@@ -44,3 +44,7 @@ func (*Ltc) GetFullName() string {
 func (*Ltc) GenerateMultisigAddress(xPub []string, index, flagM, flagN uint32, internal bool) (*models.AddressInfo, error) {
 	return nil, errors.New("currently not supported multisig for lite coin")
 }
+
+func (l *Ltc) SignTx(serializeTx []byte, privKey string, optional SigningOptional) ([]byte, error) {
+	return l.signTx(serializeTx, privKey, optional, l.NetWork)
+}

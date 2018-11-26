@@ -27,8 +27,14 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/btcsuite/btcwallet"
+  packages = ["internal/zero","snacl"]
+  revision = "c4dd27e481f9801866cf5226bfe532084772ec2a"
+
+[[projects]]
+  branch = "master"
   name = "github.com/btcsuite/golangcrypto"
-  packages = ["ripemd160"]
+  packages = ["nacl/secretbox","pbkdf2","poly1305","ripemd160","salsa20/salsa","scrypt"]
   revision = "53f62d9b43e87a6c56975cf862af7edf33a8d0df"
 
 [[projects]]
@@ -39,7 +45,7 @@
 
 [[projects]]
   name = "github.com/ethereum/go-ethereum"
-  packages = ["common","common/hexutil","common/math","crypto","crypto/secp256k1","crypto/sha3","rlp"]
+  packages = ["common","common/hexutil","common/math","common/prque","core/types","crypto","crypto/secp256k1","crypto/sha3","ethdb","log","metrics","params","rlp","trie"]
   revision = "8bbe72075e4e16442c4e28d999edee12e294329e"
   version = "v1.8.17"
 
@@ -62,6 +68,18 @@
   revision = "d51537ee11a6e6c31ba74f4b4accbc0edaf7a5d4"
 
 [[projects]]
+  name = "github.com/go-stack/stack"
+  packages = ["."]
+  revision = "2fee6af1a9795aafbe0253a0cfbdf668e1fb8a9a"
+  version = "v1.8.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/golang/snappy"
+  packages = ["."]
+  revision = "2e65f85255dbc3072edf28d6b5b8efc472979f5a"
+
+[[projects]]
   name = "github.com/pkg/errors"
   packages = ["."]
   revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
@@ -72,6 +90,12 @@
   name = "github.com/rubblelabs/ripple"
   packages = ["crypto"]
   revision = "2881d83321683abf79199054788dcb329b9f3106"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/syndtr/goleveldb"
+  packages = ["leveldb","leveldb/cache","leveldb/comparer","leveldb/errors","leveldb/filter","leveldb/iterator","leveldb/journal","leveldb/memdb","leveldb/opt","leveldb/storage","leveldb/table","leveldb/util"]
+  revision = "f9080354173f192dfc8821931eacf9cfd6819253"
 
 [[projects]]
   name = "github.com/tyler-smith/go-bip39"
@@ -88,6 +112,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c26322a9f12c5a42591d37904c7fa7ce2103bd4b203c664b1fea351e120c6a19"
+  inputs-digest = "e797ef85e6828a531f8e2255c6b68c6aef7ebb37c200e27823f4266a85f4829b"
   solver-name = "gps-cdcl"
   solver-version = 1

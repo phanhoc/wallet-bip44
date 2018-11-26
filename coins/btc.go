@@ -1,13 +1,11 @@
 package coins
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/txscript"
-	"github.com/btcsuite/btcd/wire"
 	"github.com/btcsuite/btcutil"
 	"github.com/phanhoc/wallet-bip44/coins/models"
 )
@@ -62,12 +60,12 @@ func (b *Btc) GenerateMultisigAddress(xPub []string, index, flagM, flagN uint32,
 	paths := make([]string, 0, len(xPub))
 	addresses := make([]*btcutil.AddressPubKey, 0, len(xPub))
 	for _, item := range xPub {
-		ecPubKey, branchNum, err := b.utxoDeriveEcPubKey(item, index, internal)
+		ecPubKey, branchNum, err := b.deriveEcPubKey(item, index, internal)
 		if err != nil {
 			return nil, err
 		}
 		path := fmt.Sprintf("%d/%d", branchNum, index)
-		addressInfo, err := btcutil.NewAddressPubKey(ecPubKey, b.NetWork)
+		addressInfo, err := btcutil.NewAddressPubKey(ecPubKey.SerializeCompressed(), b.NetWork)
 		if err != nil {
 			return nil, err
 		}
@@ -97,55 +95,56 @@ func (b *Btc) NewAccount(master string, accountIndex uint32) (*models.AccountInf
 }
 
 func (b *Btc) SignTx(serializeTx []byte, privKey string, optional SigningOptional) ([]byte, error) {
-	var rawTx wire.MsgTx
-	if err := rawTx.Deserialize(bytes.NewBuffer(serializeTx)); err != nil {
-		return nil, fmt.Errorf("failed to deserialize transaction, err %v", err)
-	}
-	privWIF, err := btcutil.DecodeWIF(privKey)
-	if err != nil {
-		return nil, err
-	}
-	for i, tx := range rawTx.TxIn {
-		class, addresses, _, err := txscript.ExtractPkScriptAddrs(optional.PreviousScript, b.NetWork)
-		if err != nil {
-			return nil, err
-		}
-		getKey := mkGetKey(map[string]addressToKey{
-			addresses[0].String(): {key: privWIF.PrivKey, compressed: true},
-		})
-		getScript := mkGetScript(nil)
-		if class == txscript.ScriptHashTy {
-			getScript = mkGetScript(map[string][]byte{addresses[0].String(): optional.RedeemScript})
-		}
-		script, err := b.signAndCheck(b.NetWork, &rawTx, i, rawTx.TxOut[i].Value, optional.PreviousScript, getKey, getScript, tx.SignatureScript)
-		if err != nil {
-			return nil, err
-		}
-		rawTx.TxIn[i].SignatureScript = script
-	}
-
-	buf := bytes.NewBuffer(make([]byte, 0, rawTx.SerializeSize()))
-	if err := rawTx.Serialize(buf); err != nil {
-		return nil, fmt.Errorf("failed to serialize transaction: %v", err)
-	}
-	return buf.Bytes(), nil
-}
-
-func (b *Btc) signAndCheck(params *chaincfg.Params, tx *wire.MsgTx, index int, amount int64, pkScript []byte, keyDB txscript.KeyDB,
-	scriptDB txscript.ScriptDB, prevScript []byte) ([]byte, error) {
-	script, err := txscript.SignTxOutput(params, tx, index,
-		pkScript, txscript.SigHashAll, keyDB, scriptDB, prevScript)
-	if err != nil {
-		return nil, fmt.Errorf("failed to signing transaction: %v", err)
-	}
-	// if len(b.PrevOutput[index].State.SignedBy) == int(b.PrevOutput[index].State.NRequire-1) {
-	// 	if err := common.CheckScripts("check transaction script", tx, index, amount, script, pkScript); err != nil {
-	// 		return nil, fmt.Errorf("failed to check signed transaction: %v", err)
-	// 	}
+	return b.signTx(serializeTx, privKey, optional, b.NetWork)
+	// var rawTx wire.MsgTx
+	// if err := rawTx.Deserialize(bytes.NewBuffer(serializeTx)); err != nil {
+	// 	return nil, fmt.Errorf("failed to deserialize transaction, err %v", err)
 	// }
-
-	return script, nil
+	// privWIF, err := btcutil.DecodeWIF(privKey)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// for i, tx := range rawTx.TxIn {
+	// 	class, addresses, _, err := txscript.ExtractPkScriptAddrs(optional.PreviousScript, b.NetWork)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// 	getKey := mkGetKey(map[string]addressToKey{
+	// 		addresses[0].String(): {key: privWIF.PrivKey, compressed: true},
+	// 	})
+	// 	getScript := mkGetScript(nil)
+	// 	if class == txscript.ScriptHashTy {
+	// 		getScript = mkGetScript(map[string][]byte{addresses[0].String(): optional.RedeemScript})
+	// 	}
+	// 	script, err := b.signAndCheck(b.NetWork, &rawTx, i, rawTx.TxOut[i].Value, optional.PreviousScript, getKey, getScript, tx.SignatureScript)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// 	rawTx.TxIn[i].SignatureScript = script
+	// }
+	//
+	// buf := bytes.NewBuffer(make([]byte, 0, rawTx.SerializeSize()))
+	// if err := rawTx.Serialize(buf); err != nil {
+	// 	return nil, fmt.Errorf("failed to serialize transaction: %v", err)
+	// }
+	// return buf.Bytes(), nil
 }
+
+// func (b *Btc) signAndCheck(params *chaincfg.Params, tx *wire.MsgTx, index int, amount int64, pkScript []byte, keyDB txscript.KeyDB,
+// 	scriptDB txscript.ScriptDB, prevScript []byte) ([]byte, error) {
+// 	script, err := txscript.SignTxOutput(params, tx, index,
+// 		pkScript, txscript.SigHashAll, keyDB, scriptDB, prevScript)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("failed to signing transaction: %v", err)
+// 	}
+// 	// if len(b.PrevOutput[index].State.SignedBy) == int(b.PrevOutput[index].State.NRequire-1) {
+// 	// 	if err := common.CheckScripts("check transaction script", tx, index, amount, script, pkScript); err != nil {
+// 	// 		return nil, fmt.Errorf("failed to check signed transaction: %v", err)
+// 	// 	}
+// 	// }
+//
+// 	return script, nil
+// }
 
 // mkGetKey return Key for signing btc
 func mkGetKey(keys map[string]addressToKey) txscript.KeyDB {
